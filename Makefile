@@ -4,7 +4,7 @@ export APP_NAME=file-integrity-operator
 
 # Container image variables
 # =========================
-IMAGE_REPO?=quay.io/file-integrity-operator
+IMAGE_REPO?=quay.io/gquillar
 RUNTIME?=podman
 
 # Image path to use. Set this if you want to use a specific path for building
@@ -22,7 +22,13 @@ TAG?=latest
 # ===============
 CURPATH=$(PWD)
 TARGET_DIR=$(CURPATH)/build/_output
-GO=GOFLAGS=-mod=vendor GO111MODULE=auto go
+GOFLAGS?=-mod=vendor
+ifeq ($(shell uname -m), ppc64le)
+    ARCH=ppc64le
+else
+    ARCH=x86_64
+endif
+GO=GOFLAGS=$(GOFLAGS) GOARCH=$(ARCH) GO111MODULE=auto go
 GOBUILD=$(GO) build
 BUILD_GOPATH=$(TARGET_DIR):$(CURPATH)/cmd
 TARGET_OPERATOR=$(TARGET_DIR)/bin/$(APP_NAME)
@@ -41,10 +47,11 @@ export NAMESPACE=openshift-file-integrity
 # Operator-sdk variables
 # ======================
 SDK_VERSION?=v0.18.2
-OPERATOR_SDK_URL=https://github.com/operator-framework/operator-sdk/releases/download/$(SDK_VERSION)/operator-sdk-$(SDK_VERSION)-x86_64-linux-gnu
+OPERATOR_SDK_URL=https://github.com/operator-framework/operator-sdk/releases/download/$(SDK_VERSION)/operator-sdk-$(SDK_VERSION)-$(ARCH)-linux-gnu
 
 OPM_VERSION=v1.15.2
-OPM_URL=https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/linux-amd64-opm
+OPM_URL=https://mirror.openshift.com/pub/openshift-v4/ppc64le/clients/ocp/latest-4.7/
+OPM_FILENAME=opm-linux
 
 # Test variables
 # ==============
@@ -89,7 +96,8 @@ bundle-image:
 
 .PHONY: index-image
 index-image: opm
-	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(TAG) -f $(INDEX_IMAGE_PATH):latest -t $(INDEX_IMAGE_PATH):latest -c $(RUNTIME) --overwrite-latest
+#	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(TAG) -f $(INDEX_IMAGE_PATH):latest -t $(INDEX_IMAGE_PATH):latest -c $(RUNTIME) --overwrite-latest
+	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(TAG) -t $(INDEX_IMAGE_PATH):latest -c $(RUNTIME) --overwrite-latest
 
 .PHONY: build
 build: operator-bin ## Build the file-integrity-operator binaries
@@ -109,8 +117,11 @@ $(GOPATH)/bin/operator-sdk:
 opm: $(GOPATH)/bin/opm
 
 $(GOPATH)/bin/opm:
-	wget -nv $(OPM_URL) -O $(GOPATH)/bin/opm || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
+	wget -nv $(OPM_URL)/$(OPM_FILENAME).tar.gz || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
+	tar -xvf $(OPM_FILENAME).tar.gz
+	mv ./opm $(GOPATH)/bin/opm
 	chmod +x $(GOPATH)/bin/opm
+	rm $(OPM_FILENAME).tar.gz
 
 .PHONY: run
 run: operator-sdk ## Run the file-integrity-operator locally
