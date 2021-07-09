@@ -50,7 +50,7 @@ SDK_VERSION?=v0.18.2
 OPERATOR_SDK_URL=https://github.com/operator-framework/operator-sdk/releases/download/$(SDK_VERSION)/operator-sdk-$(SDK_VERSION)-$(ARCH)-linux-gnu
 
 OPM_VERSION=v1.15.2
-OPM_URL=https://mirror.openshift.com/pub/openshift-v4/ppc64le/clients/ocp/latest-4.7/
+OPM_URL=https://mirror.openshift.com/pub/openshift-v4/$(ARCH)/clients/ocp/latest-4.7/
 OPM_FILENAME=opm-linux
 
 # Test variables
