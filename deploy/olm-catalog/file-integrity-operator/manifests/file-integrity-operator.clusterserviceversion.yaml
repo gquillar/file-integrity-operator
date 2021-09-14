@@ -24,6 +24,9 @@ metadata:
     operatorframework.io/suggested-namespace: openshift-file-integrity
     operators.openshift.io/infrastructure-features: '["Disconnected"]'
     repository: https://github.com/openshift/file-integrity-operator
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.ppc64le: supported
   name: file-integrity-operator.v0.1.18
   namespace: placeholder
 spec:
@@ -86,8 +89,8 @@ spec:
                 - name: OPERATOR_NAME
                   value: file-integrity-operator
                 - name: RELATED_IMAGE_OPERATOR
-                  value: quay.io/file-integrity-operator/file-integrity-operator:0.1.18
-                image: quay.io/file-integrity-operator/file-integrity-operator:0.1.18
+                  value: quay.io/gquillar/file-integrity-operator:0.1.18
+                image: quay.io/gquillar/file-integrity-operator:0.1.18
                 imagePullPolicy: Always
                 name: file-integrity-operator
                 resources:

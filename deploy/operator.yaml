@@ -16,7 +16,7 @@ spec:
       serviceAccountName: file-integrity-operator
       containers:
         - name: file-integrity-operator
-          image: "quay.io/file-integrity-operator/file-integrity-operator:latest"
+          image: "quay.io/gquillar/file-integrity-operator:latest"
           command:
           - file-integrity-operator
           args:
@@ -41,7 +41,7 @@ spec:
             - name: OPERATOR_NAME
               value: "file-integrity-operator"
             - name: RELATED_IMAGE_OPERATOR
-              value: "quay.io/file-integrity-operator/file-integrity-operator:latest"
+              value: "quay.io/gquillar/file-integrity-operator:latest"
           volumeMounts:
             - name: serving-cert
               mountPath: /var/run/secrets/serving-cert
